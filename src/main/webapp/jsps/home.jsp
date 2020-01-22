@@ -12,6 +12,7 @@
 <h1 align="center">Welcome to Mithun Technologies.</h1>
 <h1 align="center">Very Good Training center for DevOps with AWS in Maratha Halli and also for Job Assitance Job Support also...Teaching Real Time scnerios</h1>
 <hr>
+<h2> Hemanth is one of the student for learning devops<h2>
 <div style="text-align: center;">
 	<span>
 		<img src="images/mithunlogo.jpg" alt="" width="100">
