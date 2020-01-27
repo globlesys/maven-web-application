@@ -1,51 +1,47 @@
-
-node('node1')
-
 node
-
 {
-
-  def mavenHome=tool name: "maven3.6.3"
+    echo "GitHub BranhName ${env.BRANCH_NAME}"
+  echo "Jenkins Job Number ${env.BUILD_NUMBER}"
+  echo "Jenkins Node Name ${env.NODE_NAME}"
   
- stage('Checkout')
- {
- 	git branch: 'development', credentialsId: 'bed5a851-d84d-412e-87e7-bf9ce23c0e0e', url: 'https://github.com/MithunTechnologiesDevOps/maven-web-application.git'
- 
- }
+  echo "Jenkins Home ${env.JENKINS_HOME}"
+  echo "Jenkins URL ${env.JENKINS_URL}"
+  echo "JOB Name ${env.JOB_NAME}"
+    properties([
+     buildDiscarder(logRotator(numToKeepStr: '3')),
+     pipelineTriggers([
+         pollSCM('* * * * *')
+     ])
+   ])
+def mvnHome=tool name: "maven3.6.3"
+	stage('CheckoutCode')
+	{
+	git branch: 'development', credentialsId: 'cac2dcd1-0724-486b-9515-b77ce216b678', url: 'https://github.com/globlesys/maven-web-application.git'
+	}
+	stage('Build')
+	{
+	sh "${mvnHome}/bin/mvn clean package"
+	}
+	stage('SonarQubeReport')
+	{
+	sh "${mvnHome}/bin/mvn sonar:sonar"
+	}
+	stage('UploadArtifactToNexus')
+	{
+	sh "${mvnHome}/bin/mvn clean deploy"
+	}
+	stage('DeployToTomcat')
+	{
+	sshagent(['1f4333ec-9246-47a5-bed9-e7abaca04403']) 
+	{
+	sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.232.114.118:/opt/apache-tomcat-9.0.30/webapps"
+	}
+	}
+	stage('SentEmailNotification')
+	{
+	emailext body: '''$DEFAULT_CONTENT
 
- 
-
-
- /*
- stage('Build')
- {
- sh  "${mavenHome}/bin/mvn clean package"
- }
- 
- stage('ExecuteSoanrQubeReport')
- {
- sh  "${mavenHome}/bin/mvn sonar:sonar"
- }
- 
- stage('UploadArtifactintoNexus')
- {
- sh  "${mavenHome}/bin/mvn deploy"
- }
- 
- stage('DeployAppintoTomcat')
- {
- sshagent(['cd93d61f-2d0f-4c60-8b33-34cf4fa888b0']) {
-  sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.235.132.183:/opt/apache-tomcat-9.0.29/webapps/"
- }
- }
-*/
- stage('SendEmailNotification')
- {
- emailext body: '''Build is over..
-
- Regards,
- Mithun Technologies,
- 9980923226.''', subject: 'Build is over', to: 'devopstrainingblr@gmail.com'
- }
-
+	Thanks & regards,
+	hemanth.M.''', subject: '$DEFAULT_SUBJECT-Mitun technologies', to: 'm.hemanth.redhat@gmail.com'
+	}
 }
