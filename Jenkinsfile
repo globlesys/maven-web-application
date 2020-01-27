@@ -37,11 +37,11 @@ def mvnHome=tool name: "maven3.6.3"
 	sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.232.114.118:/opt/apache-tomcat-9.0.30/webapps"
 	}
 	}
-	stage('SentEmailNotification')
+	/*stage('SentEmailNotification')
 	{
 	emailext body: '''$DEFAULT_CONTENT
 
 	Thanks & regards,
 	hemanth.M.''', subject: '$DEFAULT_SUBJECT-Mitun technologies', to: 'm.hemanth.redhat@gmail.com'
-	}
+	}*/
 }
